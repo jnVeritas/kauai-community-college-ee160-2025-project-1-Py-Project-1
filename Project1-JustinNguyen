@@ -1,0 +1,84 @@
+# AMDG
+
+#
+# Developer: Justin Nguyen
+# Last Edited: 05/17/2025
+# Created: 05/17/2025
+# Description: Does what the instructions ask for. I might've installed MatPlotLib improperly and it's a bit late to try to figure out how to fix that. I don't want to have to repeat any class over a technical problem more than a skill one, so while I'm willing for there to be deductions for not doing that part, please don't deduct too harshly on that.
+# Comment:  Perhaps this could be optimized more, given the repeated use of "with open as"
+#
+
+import csv
+
+# Here, a variable is defined to read the number of lines.
+with open("data11Oct21.csv") as dataFile: # This line opens the csv file with the name "dataFile"
+    numbLines = len(dataFile.readlines()) # This variable reads the number of lines in the csv file.
+
+def getunsortedheader(): # This is not asked for, but it makes future lines of codes easier.
+    with open("data11Oct21.csv") as dataFileForNoSort: # This line opens the file under the name "dataFileNoSort" which doesn't have a nice ring to it but oh well it works.
+        readthis = csv.reader(dataFileForNoSort, delimiter=',') # This reads the file as a csv, considering elements separate if a comma appears.
+        for x in range(3): # The code repeats until the 3rd line (index 2), which is where all the headers appear.
+            columnnamesunsorted = next(readthis) # The list "columnnamesunsorted" is repeatedly set to the next line, which has been programmed to stop on the row with all the headers.
+    return columnnamesunsorted # A value has to be returned, and this function returns a list of all the headers in their original order so that it can be referenced later.
+
+def organizeheader(): # This is a function requested by the professor. It organizes the headers alphabetically.
+    with open("data11Oct21.csv") as dataFileForHeader: # The data is opened as "dataFileForHeader"
+        readthisagain = csv.reader(dataFileForHeader, delimiter=',') # This is the same as lne 18, but with a names renamed as appropriate.
+        for x in range(3): # This repeats up to the line containing all the headers.
+            columnnamessorted = next(readthisagain) # The header names are put into a list.
+        columnnamessorted.sort() # That list is sorted.
+    return columnnamessorted # The function returns the sorted list.
+
+def getdatafromheader(headername): # This function would create a list of all the data points from a specific column that would be later defined by the user.
+    with open("data11Oct21.csv") as dataFileForData: # The file is opened once again under a different name.
+        readthisfordata = csv.reader(dataFileForData, delimiter=',') # A different name for a csv version of the file
+        fulldata = list(readthisfordata) # This gets the entire csv file as a list.
+        try: # This try ensures the future user input can be validly used and allows for an error event to occur.
+            listofdata = [] # This starts a new, empty list.
+            index = getunsortedheader().index(headername) # This gets the column index of the user-inputed header.
+            for row in range(numbLines - 3): # Minus 3 ensures the limit does not go beyond the maximum number of rows, since we will add three in the next line.
+                listofdata.append(fulldata[row + 3][index]) # The plus 3 skips the first two lines of the csv file.
+            return listofdata # The function would either return the list of data under the under-requested header
+        except ValueError: # Allows an outcome when error occurs.
+                return "non-existent. Please try again." # or it would give an error message.
+
+def getmaxvalue(headername): # This function gets the maximum value of a user-selected header name, if they typed it verbatim to its actual text in the file.
+    with open("data11Oct21.csv") as dataFileForMax: # More file opening.
+        readthisfordata = csv.reader(dataFileForMax, delimiter=',') # More csv storing under more names.
+        fulldata = list(readthisfordata) # The entire data as a list.
+        try: # Another try except block
+            currentmax = 0 # The current maximum is set as 0, to be exceeded or kept the same depending on the other values.
+            index = getunsortedheader().index(headername) # The column index is defined here.
+            for row in range(numbLines - 3): # Rows are iterated through.
+                currentval = (fulldata[row + 3][index]) # The current value is stored at least for the current loop.
+                if float(currentval) >= float(currentmax): # This checks if the current value is higher or equal to the previous set maximum.
+                    currentmax = currentval # If it is, then change the current maximum variable to the current value.
+            return currentmax # The maximum value is returned.
+        except ValueError: # Error opportunity
+            return "non-existent. Please try again" # Gives an error message (Trust me, this should make sense looking at future lines of code).
+
+def getminvalue(headername): # The minimum value is retrieved through this function.
+    with open("data11Oct21.csv") as dataFileForMax: # You already know the drill for this line and the next few.
+        readthisfordata = csv.reader(dataFileForMax, delimiter=',') # You already know the drill for this line and the next few.
+        fulldata = list(readthisfordata) # You already know the drill for this line and the next few.
+        try: # You already know the drill for this line and the next few.
+            currentmin = 9990010 # Line 50 but a number guaranteed to be higher than all the data values (if I'm not mistaken) so that we can fine values lower than this.
+            index = getunsortedheader().index(headername) # Refer to Lines 38 and 51.
+            for row in range(numbLines - 3): # Refer to Line 39.
+                currentval = (fulldata[row + 3][index]) # Refer to Line 40.
+                if float(currentval) <= float(currentmin): # Line 54 but reversed to find the minimum this time.
+                    currentmin = currentval # The current minimum value is changed.
+            return currentmin # That value is returned.
+        except ValueError: # Except
+            return "non-existent. Please try again" # Error Message
+
+print("You have " + str(numbLines) + " lines of data. \n") # Number of lines
+print("The following are your possible entries for a data search: " + str(organizeheader())) # Headers organized alphabetically
+print("Please the entry of what data you would like to find.") # Ask for user input
+
+headerName = input() # User input is noted.
+
+print("The values in that category are " + str(getdatafromheader(headerName)) + ".") # User input is taken, if possible, to get data points under the mentioned column.
+print("Its maximum value is " + str(getmaxvalue(headerName)) + ".") # User input is taken, if possible, to get maximum point under the mentioned column.
+print("Its minimum value is " + str(getminvalue(headerName)) + ".") # User input is taken, if possible, to get minimum point under the mentioned column.
+
